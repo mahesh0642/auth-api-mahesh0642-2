@@ -1,24 +1,31 @@
-import { createApp } from './app.js';
-import { connectDB } from './db/connect.js';
+import express from 'express';
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import { errorHandler } from './middlewares/error.middleware.js';
+import { notFound } from './middlewares/notFound.middleware.js';
 
-async function start() {
-  try {
-    // TODO: Read PORT from process.env, default to 3000
-    const port = undefined;
-
-    // TODO: Read MONGO_URI from process.env, default to "mongodb://localhost:27017/auth_api"
-    const uri = undefined;
-
-    await connectDB(uri);
-    const app = createApp();
-
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
+/**
+ * TODO: Create Express app
+ *
+ * 1. Create app with express()
+ * 2. Add express.json() middleware
+ * 3. Add GET /health route → { ok: true }
+ * 4. Mount auth routes at /api/auth
+ * 5. Mount user routes at /api/users
+ * 6. Add notFound middleware
+ * 7. Add errorHandler middleware (must be last!)
+ * 8. Return app
+ */
+export function createApp() {
+  // Your code here
+  const app = express()
+  app.use(express.json())
+  
+  app.get('/health',(req,res)=>res.status(200).json({ ok: true}))
+  app.use('/api/auth',authRoutes)
+  app.use('/api/users',userRoutes)
+  app.use(notFound);
+  app.use(errorHandler)
+  
+  return app
 }
-
-start();
